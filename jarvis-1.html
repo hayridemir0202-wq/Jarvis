@@ -573,7 +573,7 @@ async function sendMessage() {
       method: 'POST',
       headers: { headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY }, },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: MODEL,
         max_tokens: 1000,
         system: SYSTEM,
         messages: conversationHistory
