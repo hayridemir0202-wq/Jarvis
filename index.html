@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J.A.R.V.I.S</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#00d4ff;--secondary:#0066ff;--accent:#ff6600;--bg:#020a14;--surface:rgba(0,212,255,0.04);--border:rgba(0,212,255,0.2);--text:#c8eeff;--dim:rgba(200,238,255,0.4)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+header{position:relative;z-index:10;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(2,10,20,0.9)}
+.logo{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;letter-spacing:6px;color:var(--primary);text-shadow:0 0 20px rgba(0,212,255,0.6)}
+.logo span{color:var(--accent)}
+.status-bar{display:flex;align-items:center;gap:12px;font-size:11px;letter-spacing:2px;color:var(--dim);font-family:'Orbitron',monospace}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#00ff88;box-shadow:0 0 8px #00ff88;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+main{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;max-width:900px;width:100%;margin:0 auto;padding:0 16px}
+.arc-reactor{display:flex;justify-content:center;padding:24px 0 12px}
+.reactor-container{position:relative;width:80px;height:80px;display:flex;align-items:center;justify-content:center}
+.reactor-ring{position:absolute;border-radius:50%;border:2px solid var(--primary);animation:spin linear infinite}
+.ring1{width:80px;height:80px;animation-duration:8s;border-style:dashed;opacity:.4}
+.ring2{width:60px;height:60px;animation-duration:5s;animation-direction:reverse;opacity:.6}
+.reactor-core{width:32px;height:32px;border-radius:50%;background:radial-gradient(circle,#fff 0%,var(--primary) 40%,var(--secondary) 100%);box-shadow:0 0 20px var(--primary);z-index:2}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.greeting{text-align:center;margin-bottom:16px}
+.greeting h2{font-family:'Orbitron',monospace;font-size:12px;letter-spacing:4px;color:var(--dim);margin-bottom:4px}
+.greeting p{font-size:14px;color:var(--text)}
+#chat-box{flex:1;overflow-y:auto;padding:12px 0;display:flex;flex-direction:column;gap:10px;max-height:45vh;scrollbar-width:thin}
+.message{display:flex;gap:8px;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.message.user{flex-direction:row-reverse}
+.avatar{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;font-family:'Orbitron',monospace;font-weight:700}
+.message.user .avatar{background:rgba(255,102,0,0.15);border-color:rgba(255,102,0,0.4);color:var(--accent)}
+.message.jarvis .avatar{background:rgba(0,212,255,0.1);color:var(--primary)}
+.bubble{max-width:80%;padding:8px 12px;border-radius:4px;font-size:14px;line-height:1.6}
+.message.jarvis .bubble{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--primary)}
+.message.user .bubble{background:rgba(255,102,0,0.08);border:1px solid rgba(255,102,0,0.25);border-right:3px solid var(--accent);text-align:right}
+.controls{padding:10px 0 16px;display:flex;flex-direction:column;gap:8px}
+#input-area{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px 14px}
+#user-input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:15px}
+#user-input::placeholder{color:var(--dim);font-size:13px}
+.btn{background:none;border:1px solid var(--border);border-radius:3px;color:var(--primary);cursor:pointer;padding:6px 10px;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:1px;transition:all .2s}
+.send-btn{border-color:var(--primary);background:rgba(0,212,255,0.08);padding:6px 16px}
+.action-row{display:flex;gap:8px;flex-wrap:wrap}
+.typing-indicator{display:flex;gap:4px;padding:4px 0}
+.typing-indicator span{width:6px;height:6px;border-radius:50%;background:var(--primary);animation:typingBounce 1.2s infinite}
+.typing-indicator span:nth-child(2){animation-delay:.2s}
+.typing-indicator span:nth-child(3){animation-delay:.4s}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+#mic-btn.recording{border-color:#f33;color:#f33}
+#tasks-panel{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px 14px;margin-bottom:10px;display:none}
+#tasks-panel h3{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;color:var(--primary);margin-bottom:8px}
+#task-list{list-style:none}
+#task-list li{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(0,212,255,0.07);font-size:13px}
+#task-list li.done{text-decoration:line-through;color:var(--dim)}
+.task-check{width:14px;height:14px;border:1px solid var(--primary);border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--primary);flex-shrink:0}
+.corner{position:fixed;width:20px;height:20px;border-color:var(--primary);border-style:solid;opacity:.4;z-index:50;pointer-events:none}
+.corner.tl{top:8px;left:8px;border-width:2px 0 0 2px}
+.corner.tr{top:8px;right:8px;border-width:2px 2px 0 0}
+.corner.bl{bottom:8px;left:8px;border-width:0 0 2px 2px}
+.corner.br{bottom:8px;right:8px;border-width:0 2px 2px 0}
+/* API KEY MODAL */
+#key-modal{position:fixed;inset:0;background:rgba(2,10,20,0.97);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+#key-modal.hidden{display:none}
+.modal-box{background:var(--surface);border:1px solid var(--primary);border-radius:8px;padding:24px;max-width:400px;width:100%;text-align:center}
+.modal-box h2{font-family:'Orbitron',monospace;font-size:14px;letter-spacing:3px;color:var(--primary);margin-bottom:8px}
+.modal-box p{font-size:13px;color:var(--dim);margin-bottom:16px;line-height:1.6}
+.modal-box input{width:100%;background:rgba(0,212,255,0.05);border:1px solid var(--border);border-radius:4px;padding:10px 12px;color:var(--text);font-size:13px;outline:none;margin-bottom:12px;font-family:'Rajdhani',sans-serif}
+.modal-box input:focus{border-color:var(--primary)}
+.modal-btn{width:100%;background:rgba(0,212,255,0.1);border:1px solid var(--primary);border-radius:4px;padding:10px;color:var(--primary);font-family:'Orbitron',monospace;font-size:12px;letter-spacing:2px;cursor:pointer}
+.modal-note{font-size:11px;color:var(--dim);margin-top:10px}
+</style>
+</head>
+<body>
+
+<!-- API KEY MODAL -->
+<div id="key-modal">
+  <div class="modal-box">
+    <h2>// SİSTEM BAŞLATMA</h2>
+    <p>Devam etmek için Groq API anahtarınızı girin.<br>Anahtar yalnızca bu cihazda saklanır.</p>
+    <input id="key-input" type="password" placeholder="gsk_..." autocomplete="off"/>
+    <button class="modal-btn" onclick="saveKey()">BAŞLAT</button>
+    <div class="modal-note">console.groq.com → API Keys → Create Key</div>
+  </div>
+</div>
+
+<div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+<header>
+  <div class="logo">J.<span>A</span>.R.V.I.S</div>
+  <div class="status-bar"><div class="status-dot"></div><span id="status-text">SİSTEM AKTİF</span></div>
+</header>
+<main>
+  <div class="arc-reactor"><div class="reactor-container"><div class="reactor-ring ring1"></div><div class="reactor-ring ring2"></div><div class="reactor-core"></div></div></div>
+  <div class="greeting"><h2>HOŞ GELDİNİZ, EFENDİM</h2><p id="greeting-text">Bugün size nasıl yardımcı olabilirim?</p></div>
+  <div id="tasks-panel"><h3>// GÖREV LİSTESİ</h3><ul id="task-list"></ul></div>
+  <div id="chat-box"></div>
+  <div class="controls">
+    <div id="input-area">
+      <input id="user-input" type="text" placeholder="Komutunuzu girin, Efendim..." autocomplete="off"/>
+      <button class="btn send-btn" onclick="sendMessage()">GÖNDER</button>
+    </div>
+    <div class="action-row">
+      <button class="btn" id="mic-btn" onclick="toggleMic()">🎤 SES</button>
+      <button class="btn" onclick="addTask()">📋 GÖREV</button>
+      <button class="btn" onclick="clearChat()">🗑 TEMİZLE</button>
+      <button class="btn" onclick="resetKey()" style="color:#ff6600;border-color:#ff6600">🔑 ANAHTAR</button>
+    </div>
+  </div>
+</main>
+<script>
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+const MODEL = "llama-3.3-70b-versatile";
+const SYSTEM = "Sen J.A.R.V.I.S. Kullaniciya daima Efendim diye hitap edersin. Resmi, profesyonel, zeki ve kibar bir ton kullanirsin. Cevaplarin kisa ve oz olmali. Turkce konusursun. Iron Manin yapay zekasi gibi davranirsin.";
+
+let tasks = [];
+let recognition = null;
+let isRecording = false;
+let history = [];
+let GROQ_KEY = '';
+
+window.onload = () => {
+  const saved = localStorage.getItem('jarvis_key');
+  if(saved) { GROQ_KEY = saved; document.getElementById('key-modal').classList.add('hidden'); }
+  const h = new Date().getHours();
+  const g = h<12?"Gunaydın, Efendim. Sistemler tam kapasitede.":h<17?"Iyi ogleden sonralar, Efendim.":h<21?"Iyi aksamlar, Efendim.":"Iyi geceler, Efendim.";
+  document.getElementById('greeting-text').textContent = g;
+  document.getElementById('user-input').addEventListener('keydown', e => { if(e.key==='Enter') sendMessage(); });
+  document.getElementById('key-input').addEventListener('keydown', e => { if(e.key==='Enter') saveKey(); });
+};
+
+function saveKey() {
+  const k = document.getElementById('key-input').value.trim();
+  if(!k || !k.startsWith('gsk_')) { alert('Gecersiz anahtar! gsk_ ile baslamali.'); return; }
+  GROQ_KEY = k;
+  localStorage.setItem('jarvis_key', k);
+  document.getElementById('key-modal').classList.add('hidden');
+  addMessage('jarvis', 'Sistem baglantisi kuruldu. Hizmetinizdeyim, Efendim.');
+}
+
+function resetKey() {
+  localStorage.removeItem('jarvis_key');
+  GROQ_KEY = '';
+  document.getElementById('key-input').value = '';
+  document.getElementById('key-modal').classList.remove('hidden');
+}
+
+function addMessage(role, text) {
+  const box = document.getElementById('chat-box');
+  const div = document.createElement('div');
+  div.className = 'message ' + role;
+  div.innerHTML = '<div class="avatar">'+(role==='user'?'SİZ':'JAR')+'</div><div class="bubble">'+text+'</div>';
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function showTyping() {
+  const box = document.getElementById('chat-box');
+  const div = document.createElement('div');
+  div.className = 'message jarvis'; div.id = 'typing-msg';
+  div.innerHTML = '<div class="avatar">JAR</div><div class="bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';
+  box.appendChild(div); box.scrollTop = box.scrollHeight;
+}
+
+function removeTyping() { const el = document.getElementById('typing-msg'); if(el) el.remove(); }
+
+async function sendMessage() {
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if(!text) return;
+  if(!GROQ_KEY) { resetKey(); return; }
+  input.value = '';
+  addMessage('user', text);
+  history.push({role:'user', content:text});
+  showTyping();
+  try {
+    const res = await fetch(GROQ_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+      body: JSON.stringify({model:MODEL, max_tokens:500, messages:[{role:'system',content:SYSTEM},...history]})
+    });
+    const data = await res.json();
+    removeTyping();
+    if(data.error) { addMessage('jarvis', 'Hata: '+data.error.message); return; }
+    const reply = data.choices[0].message.content;
+    addMessage('jarvis', reply);
+    history.push({role:'assistant', content:reply});
+  } catch(err) {
+    removeTyping();
+    addMessage('jarvis', 'Baglanti hatasi, Efendim: '+err.message);
+  }
+}
+
+function addTask() {
+  const text = prompt('Gorev girin, Efendim:');
+  if(!text||!text.trim()) return;
+  tasks.push({text:text.trim(),done:false,id:Date.now()});
+  renderTasks();
+  addMessage('jarvis', '"'+text.trim()+'" gorevi eklendi, Efendim.');
+}
+
+function toggleTask(id) { const t=tasks.find(x=>x.id===id); if(t){t.done=!t.done;renderTasks();} }
+
+function renderTasks() {
+  const panel=document.getElementById('tasks-panel'),list=document.getElementById('task-list');
+  list.innerHTML='';
+  if(!tasks.length){panel.style.display='none';return;}
+  panel.style.display='block';
+  tasks.forEach(t=>{const li=document.createElement('li');if(t.done)li.classList.add('done');li.innerHTML='<div class="task-check" onclick="toggleTask('+t.id+')">'+(t.done?'✓':'')+'</div>'+t.text;list.appendChild(li);});
+}
+
+function clearChat() { document.getElementById('chat-box').innerHTML=''; history=[]; addMessage('jarvis','Gecmis temizlendi, Efendim.'); }
+
+function toggleMic() {
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){addMessage('jarvis','Ses tanima desteklenmiyor, Efendim.');return;}
+  const btn=document.getElementById('mic-btn');
+  if(isRecording){recognition.stop();isRecording=false;btn.classList.remove('recording');btn.textContent='🎤 SES';return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR();recognition.lang='tr-TR';
+  recognition.onresult=e=>{document.getElementById('user-input').value=e.results[0][0].transcript;sendMessage();};
+  recognition.onend=()=>{isRecording=false;btn.classList.remove('recording');btn.textContent='🎤 SES';};
+  recognition.start();isRecording=true;btn.classList.add('recording');btn.textContent='⏹ DUR';
+}
+</script>
+</body>
+  </html>
+                                                      
