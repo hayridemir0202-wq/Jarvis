@@ -575,16 +575,14 @@ async function sendMessage() {
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 1000,
-        system: SYSTEM,
-        messages: conversationHistory
+        messages: [{role:'system',content:SYSTEM}, ...conversationHistory],
+        
       })
     });
 
     const data = await res.json();
-    removeTyping();
-
-    const reply = data.content?.map(b => b.text || '').join('') || 'Bir hata oluştu, Efendim.';
-
+    removeTyping()
+const reply = data.choices?.[0]?.message?.content || 'Bir hata oluştu, Efendim.';
     // Check for task action
     const taskMatch = reply.match(/\{"action":"add_task","task":"(.+?)"\}/);
     if (taskMatch) {
