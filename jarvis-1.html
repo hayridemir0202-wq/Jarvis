@@ -581,7 +581,7 @@ async function sendMessage() {
     });
 
     const data = await res.json();
-    removeTyping()
+    removeTyping();
 const reply = data.choices?.[0]?.message?.content || 'Bir hata oluştu, Efendim.';
     // Check for task action
     const taskMatch = reply.match(/\{"action":"add_task","task":"(.+?)"\}/);
